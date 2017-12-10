@@ -30,6 +30,7 @@ library
   build-depends:
       base >= 4.7 && < 5
   exposed-modules:
+      Chapter2.SimpleFunctions
       Lib
   default-language: Haskell2010
 
@@ -52,4 +53,19 @@ test-suite future-store-test
   build-depends:
       base >= 4.7 && < 5
     , future-store
+  default-language: Haskell2010
+
+test-suite unit-tests
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  hs-source-dirs:
+      test/unit
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >= 4.7 && < 5
+    , future-store
+    , hspec
+    , hspec-discover
+  other-modules:
+      Chapter2.SimpleFunctionsSpec
   default-language: Haskell2010
