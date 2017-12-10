@@ -8,6 +8,12 @@
             "type": "shell",
             "command": "stack build; stack exec future-store-exe",
             "problemMatcher": []
+        },
+        {
+            "label": "Run unit tests",
+            "type": "shell",
+            "command": "stack test :unit-tests",
+            "problemMatcher": []
         }
     ]
 }
