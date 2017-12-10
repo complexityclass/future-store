@@ -9,3 +9,9 @@ spec = do
 
         it "reverse the string" $ do
             reverse2 "hello" `shouldBe` "olleh"
+
+        it "concat two strings" $ do
+            "hello" +++ " world" `shouldBe` "hello world"
+        
+        it "find max and min" $ do
+            maxmin [3,4,1,9,6] `shouldBe` (9, 1)
