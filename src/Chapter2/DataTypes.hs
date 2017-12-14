@@ -3,8 +3,12 @@ module Chapter2.DataTypes (
     Person (..),
     Gender (..),
     GenderStatInfo (..),
+    TimeMachine (..),
+    Producer (..),
+    TimeMachineInfo (..),
     clientName,
-    genderStat
+    genderStat,
+    performSale
     ) where
 
 data Client = GovOrg     String
@@ -18,11 +22,11 @@ data Person = Person String String Gender
 data Gender = Male | Female | Unknown
             deriving Show
 
-data TimeMachine = TimeMachine TimeMachineInfo Float deriving Show
+data TimeMachine = TimeMachine TimeMachineInfo Float deriving (Show, Eq)
 
-data Producer = Producer String deriving Show
+data Producer = Producer String deriving (Show, Eq)
 
-data TimeMachineInfo = TimeMachineInfo Producer Int Bool deriving Show  
+data TimeMachineInfo = TimeMachineInfo Producer Int Bool deriving (Show, Eq)  
 
 clientName :: Client -> String
 clientName client = case client of
@@ -57,6 +61,12 @@ genderStat clients =
                 applyStat _ stat                                  = stat
             in calc xs (applyStat client stats)
     in calc clients (GenderStatInfo 0 0)
+
+
+performSale :: [TimeMachine] -> Float -> [TimeMachine]
+performSale [] _ = []
+performSale (x:xs) sale = [case x of
+                      (TimeMachine info gross) -> (TimeMachine info (gross * sale))] ++ (performSale xs sale)
 
 
 
