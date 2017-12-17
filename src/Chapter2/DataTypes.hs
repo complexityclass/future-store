@@ -1,3 +1,7 @@
+{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE RecordWildCards #-}
+
 module Chapter2.DataTypes (
     Client (..),
     Person (..),
@@ -9,8 +13,13 @@ module Chapter2.DataTypes (
     clientName,
     genderStat,
     performSale,
-    unzip'
+    unzip',
+    ClientR (..),
+    PersonR (..),
+    greet
     ) where
+
+import Data.Char
 
 data Client = GovOrg     String
             | Company    String Integer Person Bool
@@ -23,11 +32,14 @@ data Person = Person String String Gender
 data Gender = Male | Female | Unknown
             deriving Show
 
-data TimeMachine = TimeMachine TimeMachineInfo Float deriving (Show, Eq)
+data TimeMachine = TimeMachine { info :: TimeMachineInfo
+                               , price :: Float } deriving (Show, Eq)
 
-data Producer = Producer String deriving (Show, Eq)
+data Producer = Producer { name :: String } deriving (Show, Eq)
 
-data TimeMachineInfo = TimeMachineInfo Producer Int Bool deriving (Show, Eq)  
+data TimeMachineInfo = TimeMachineInfo { producer :: Producer
+                                       , model :: Int
+                                       , new :: Bool } deriving (Show, Eq)  
 
 clientName :: Client -> String
 clientName client = case client of
@@ -69,9 +81,16 @@ genderStat clients =
 
 performSale :: [TimeMachine] -> Float -> [TimeMachine]
 performSale [] _ = []
-performSale (x:xs) sale = [case x of
-                      (TimeMachine info gross) -> (TimeMachine info (gross * sale))] 
-                                                    ++ (performSale xs sale)
+
+-- Perform sale impl
+-- performSale (x:xs) sale = [case x of
+--                       (TimeMachine info gross) -> (TimeMachine info (gross * sale))] 
+--                                                     ++ (performSale xs sale)
+
+-- Task 2.7 Perform sale with record syntax
+performSale (machine@(TimeMachine { .. }):xs) sale = 
+    let currentPrice = price
+     in [machine { price = currentPrice * sale }] ++ (performSale xs sale)                                              
 
 -- Task 2.6
 -- Write a function to unzip list of tuples                                                    
@@ -83,3 +102,38 @@ unzip' :: [(Int, Int)] -> ([Int], [Int])
 unzip' [] = ([], [])
 unzip' (x:xs) = plus ((fst x), (snd x)) (unzip' xs)
 
+
+responsibility :: Client -> String
+responsibility (Company r _ _ _ ) = r
+responsibility _ = "Unknown"
+
+specialClient :: Client -> Bool
+specialClient (clientName -> "Mr. Alejandro") = True
+specialClient (responsibility -> "Director") = True
+specialClient _ = False 
+
+
+-- Records
+
+data ClientR = GovOrgR  { clientRName :: String } 
+             | CompanyR { clientRName :: String
+                        , companyId :: Integer
+                        , person :: PersonR
+                        , duty :: String }
+             | IndividualR { person :: PersonR }
+             deriving Show
+
+data PersonR = PersonR { firstName :: String
+                       , lastName :: String }
+                       deriving Show
+
+greet :: ClientR -> String
+greet IndividualR { person = PersonR { .. } } = "Hi, " ++ firstName
+greet CompanyR { .. } = "Hello, " ++ clientRName
+greet GovOrgR { } = "Welcome"
+
+nameInCapitals :: PersonR -> PersonR
+nameInCapitals p@(PersonR { firstName = initial:rest }) =
+    let newName = (toUpper initial):rest
+     in p { firstName = newName }
+nameInCapitals p@(PersonR { firstName = ""}) = p

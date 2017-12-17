@@ -29,7 +29,12 @@ spec = do
 
              in prices `shouldBe` [50, 100, 200]
 
-        it "unzip lists" $ do
+        it "Unzip lists" $ do
             let input = [(1,2), (3,4), (5,6)]
              in unzip' input `shouldBe` ([1,3,5], [2,4,6])
+
+        it "Greet clien " $ do
+            let client = IndividualR { person = PersonR { lastName = "Smith", firstName = "John" } }
+                greeting = greet client
+             in greeting `shouldBe` "Hi, John"
 
