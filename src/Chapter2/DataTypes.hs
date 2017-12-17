@@ -137,3 +137,23 @@ nameInCapitals p@(PersonR { firstName = initial:rest }) =
     let newName = (toUpper initial):rest
      in p { firstName = newName }
 nameInCapitals p@(PersonR { firstName = ""}) = p
+
+
+-- Default values
+
+data ConnType = TCP | UDP
+data UserProxy = NoProxy | Proxy String
+data Timeout = NoTimeOut | TimeOut Integer
+data ConnOptions = ConnOptions { connType      :: ConnType
+                               , connSpeed     :: Integer
+                               , connProxy     :: UserProxy
+                               , connCaching   :: Bool
+                               , connKeepAlive :: Bool
+                               , connTimeOut   :: Timeout }
+data Connection = Connection
+
+connDefault :: ConnOptions
+connDefault = ConnOptions TCP 0 NoProxy False False NoTimeOut
+
+connect' :: String -> ConnOptions -> Connection
+connect' _ = undefined
