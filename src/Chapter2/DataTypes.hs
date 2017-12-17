@@ -40,6 +40,9 @@ companyName client = case client of
     Company name _ _ _  -> Just name
     _                   -> Nothing
 
+-- Task 2.5
+-- Write a function to return a count of persons groupped by gender
+-- Write a function for sale time machines
 
 data GenderStatInfo = GenderStatInfo Int Int deriving (Show, Eq)
 
@@ -70,11 +73,13 @@ performSale (x:xs) sale = [case x of
                       (TimeMachine info gross) -> (TimeMachine info (gross * sale))] 
                                                     ++ (performSale xs sale)
 
+-- Task 2.6
+-- Write a function to unzip list of tuples                                                    
 
 plus :: (Int, Int) -> ([Int], [Int]) -> ([Int], [Int])
 plus (x, y) (xs, ys) = ([x] ++ xs, [y] ++ ys)                                                      
 
 unzip' :: [(Int, Int)] -> ([Int], [Int])
 unzip' [] = ([], [])
-unzip' (x:xs) = plus ((fst x), (snd x)) (unzip xs)
- 
+unzip' (x:xs) = plus ((fst x), (snd x)) (unzip' xs)
+
