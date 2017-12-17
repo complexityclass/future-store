@@ -28,3 +28,8 @@ spec = do
                                           (TimeMachine _ value) -> value) result
 
              in prices `shouldBe` [50, 100, 200]
+
+        it "unzip lists" $ do
+            let input = [(1,2), (3,4), (5,6)]
+             in unzip' input `shouldBe` ([1,3,5], [2,4,6])
+

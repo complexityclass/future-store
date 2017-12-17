@@ -8,7 +8,8 @@ module Chapter2.DataTypes (
     TimeMachineInfo (..),
     clientName,
     genderStat,
-    performSale
+    performSale,
+    unzip'
     ) where
 
 data Client = GovOrg     String
@@ -66,8 +67,14 @@ genderStat clients =
 performSale :: [TimeMachine] -> Float -> [TimeMachine]
 performSale [] _ = []
 performSale (x:xs) sale = [case x of
-                      (TimeMachine info gross) -> (TimeMachine info (gross * sale))] ++ (performSale xs sale)
+                      (TimeMachine info gross) -> (TimeMachine info (gross * sale))] 
+                                                    ++ (performSale xs sale)
 
 
+plus :: (Int, Int) -> ([Int], [Int]) -> ([Int], [Int])
+plus (x, y) (xs, ys) = ([x] ++ xs, [y] ++ ys)                                                      
 
+unzip' :: [(Int, Int)] -> ([Int], [Int])
+unzip' [] = ([], [])
+unzip' (x:xs) = plus ((fst x), (snd x)) (unzip xs)
  
