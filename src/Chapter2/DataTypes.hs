@@ -24,13 +24,13 @@ import Data.Char
 data Client = GovOrg     String
             | Company    String Integer Person Bool
             | Individual Person Bool
-            deriving Show
+            deriving (Show, Eq)
 
 data Person = Person String String Gender
-            deriving Show
+            deriving (Show, Eq)
 
 data Gender = Male | Female | Unknown
-            deriving Show
+            deriving (Show, Eq)
 
 data TimeMachine = TimeMachine { info :: TimeMachineInfo
                                , price :: Float } deriving (Show, Eq)
