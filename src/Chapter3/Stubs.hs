@@ -1,6 +1,7 @@
 module Chapter3.Stubs(
     buildGovOrg,
-    buildIndividual
+    buildIndividual,
+    buildClientWithName
 ) where
 
 import Chapter2.DataTypes
@@ -13,4 +14,7 @@ buildGovOrg = GovOrg "Hospital"
 
 buildIndividual :: Client
 buildIndividual = Individual buildPerson True
+
+buildClientWithName :: String -> Client
+buildClientWithName name = GovOrg name
 

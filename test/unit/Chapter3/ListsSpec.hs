@@ -15,3 +15,19 @@ spec = do
             let govOrg     = buildGovOrg
                 individual = buildIndividual
              in (filterGovOrgs [govOrg, individual]) `shouldBe` [govOrg]
+
+        it "Test products" $ do
+            let sample = [1, 2, 3, 4, 5]
+                res1 = productP sample
+                res2 = productFold sample
+             in [res1, res2] `shouldBe` [120, 120]
+
+        it "Test min client name" $ do
+            let a = buildGovOrg
+                b = buildIndividual
+                c = buildClientWithName "ABC"
+                d = buildClientWithName "ABCDE"
+             in minimumClient [a, b, c, d] `shouldBe` (Just c)
+
+
+    

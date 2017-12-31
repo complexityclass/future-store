@@ -16,6 +16,8 @@ module Chapter2.DataTypes (
     unzip',
     ClientR (..),
     PersonR (..),
+    ConnOptions(),
+    connDefault,
     greet
     ) where
 
