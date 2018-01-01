@@ -2,7 +2,9 @@ module Chapter3.ListsSpec where
     
 import Test.Hspec
 import Chapter3.Lists
+import Chapter2.DataTypes
 import Chapter3.Stubs
+import Data.List
 
 spec :: Spec
 spec = do
@@ -30,6 +32,11 @@ spec = do
                 res1 = minimumClient [a, b, c, d]
                 res2 = minimumClient' [a, b, c, d]
              in (res1, res2) `shouldBe` (Just c, Just c)
+
+        it "Sort clients" $ do
+            (sortBy compareClient listOfClients) !! 0 `shouldBe` (GovOrg {clientId = 3, clientName = "NTTF"}) 
+
+        
 
 
     

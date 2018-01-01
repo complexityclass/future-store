@@ -14,6 +14,7 @@ module Chapter2.DataTypes (
     genderStat,
     performSale,
     unzip',
+    compareClient,
     ConnOptions(),
     connDefault,
     greet
@@ -125,6 +126,14 @@ nameInCapitals p@(Person { firstName = initial:rest }) =
      in p { firstName = newName }
 nameInCapitals p@(Person { firstName = ""}) = p
 
+---
+compareClient :: Client a -> Client a -> Ordering
+compareClient (Individual { person = p1 }) (Individual { person = p2 }) 
+    = compare (firstName p1) (firstName p2)
+
+compareClient (Individual {}) _ = GT
+compareClient _ (Individual {}) = LT
+compareClient c1 c2 = compare (clientName c1) (clientName c2)
 
 -- Default values
 
