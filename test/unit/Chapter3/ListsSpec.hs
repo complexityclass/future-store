@@ -27,7 +27,9 @@ spec = do
                 b = buildIndividual
                 c = buildClientWithName "ABC"
                 d = buildClientWithName "ABCDE"
-             in minimumClient [a, b, c, d] `shouldBe` (Just c)
+                res1 = minimumClient [a, b, c, d]
+                res2 = minimumClient' [a, b, c, d]
+             in (res1, res2) `shouldBe` (Just c, Just c)
 
 
     

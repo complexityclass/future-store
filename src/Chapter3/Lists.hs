@@ -5,7 +5,8 @@ module Chapter3.Lists (
     filterGovOrgs,
     productP,
     productFold,
-    minimumClient
+    minimumClient,
+    minimumClient'
 ) where
 
 import Chapter2.DataTypes
@@ -87,3 +88,14 @@ minimumClient clients =
                                             then iter xs x
                                             else iter xs acc 
      in iter clients (clients !! 1)
+
+minimumClient' :: [Client] -> Maybe Client
+minimumClient' clients = foldr (\client acc -> 
+                                     let nameLength = length . clientName
+                                      in case acc of
+                                        Nothing   -> Just client
+                                        Just curr -> if nameLength curr > nameLength client
+                                                      then Just client
+                                                      else Just curr) Nothing clients 
+
+
