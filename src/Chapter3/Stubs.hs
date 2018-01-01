@@ -9,12 +9,12 @@ import Chapter2.DataTypes
 buildPerson :: Person
 buildPerson = Person "Jack" "Smith" Male 
 
-buildGovOrg :: Client
-buildGovOrg = GovOrg "Hospital"
+buildGovOrg :: Client Int
+buildGovOrg = GovOrg 123 "Hospital"
 
-buildIndividual :: Client
-buildIndividual = Individual buildPerson True
+buildIndividual :: Client Int
+buildIndividual = Individual 123 buildPerson
 
-buildClientWithName :: String -> Client
-buildClientWithName name = GovOrg name
+buildClientWithName :: String -> Client Int
+buildClientWithName name = GovOrg 123 name
 

@@ -36,8 +36,8 @@ filterANumber n arr = filter (== n) arr
 filterNot :: Int -> [Int] -> [Int]
 filterNot n arr = filter (/= n) arr
 
-filterGovOrgs :: [Client] -> [Client]
-filterGovOrgs clients = filter (\case GovOrg _ -> True
+filterGovOrgs :: [Client a] -> [Client a]
+filterGovOrgs clients = filter (\case GovOrg _ _ -> True
                                       _        -> False) clients
 
 permutationsStartingWith :: Char -> String -> [String]
@@ -78,34 +78,35 @@ productP (x:xs) = x * (productP xs)
 productFold :: [Int] -> Int
 productFold = foldr (*) 1 
 
-minimumClient :: [Client] -> Maybe Client
+minimumClient :: [Client a] -> Maybe (Client a)
 minimumClient [] = Nothing
 minimumClient clients = 
     let iter = \list acc -> case list of 
                              (x:[]) -> Just acc
-                             (x:xs) -> let nameLength = length . clientName
+                             (x:xs) -> let nameLength = length . getClientName
                                         in if nameLength x < nameLength acc 
                                             then iter xs x
                                             else iter xs acc 
      in iter clients (clients !! 1)
 
-minimumClient' :: [Client] -> Maybe Client
+minimumClient' :: [Client a] -> Maybe (Client a)
 minimumClient' clients = foldr (\client acc -> 
-                                     let nameLength = length . clientName
+                                     let nameLength = length . getClientName
                                       in case acc of
                                         Nothing   -> Just client
                                         Just curr -> if nameLength curr > nameLength client
                                                       then Just client
                                                       else Just curr) Nothing clients
                                                       
-skipUntilGov :: [Client] -> [Client]
+skipUntilGov :: [Client a] -> [Client a]
 skipUntilGov = dropWhile (\case { GovOrg {} -> False; _ -> True })
 
-isIndividual :: Client -> Bool
+isIndividual :: Client a -> Bool
 isIndividual (Individual {}) = True
 isIndividual _               = False
 
-checkIndividualAnalytics :: [Client] -> (Bool, Bool)
+checkIndividualAnalytics :: [Client a] -> (Bool, Bool)
 checkIndividualAnalytics cs = (any isIndividual cs, not $ all isIndividual cs)
 
+ 
 

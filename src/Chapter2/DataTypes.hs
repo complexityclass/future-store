@@ -10,12 +10,10 @@ module Chapter2.DataTypes (
     TimeMachine (..),
     Producer (..),
     TimeMachineInfo (..),
-    clientName,
+    getClientName,
     genderStat,
     performSale,
     unzip',
-    ClientR (..),
-    PersonR (..),
     ConnOptions(),
     connDefault,
     greet
@@ -23,16 +21,16 @@ module Chapter2.DataTypes (
 
 import Data.Char
 
-data Client = GovOrg     String
-            | Company    String Integer Person Bool
-            | Individual Person Bool
-            deriving (Show, Eq)
+data Client i = GovOrg   { clientId :: i, clientName :: String }
+              | Company  { clientId :: i, clientName :: String, person :: Person, duty :: String }
+              | Individual { clientId :: i, person :: Person }
+              deriving (Show, Eq)
 
-data Person = Person String String Gender
-            deriving (Show, Eq)
+data Person = Person { firstName :: String, lastName :: String, gender :: Gender }
+              deriving (Show, Eq)
 
 data Gender = Male | Female | Unknown
-            deriving (Show, Eq)
+              deriving (Show, Eq)
 
 data TimeMachine = TimeMachine { info :: TimeMachineInfo
                                , price :: Float } deriving (Show, Eq)
@@ -43,15 +41,15 @@ data TimeMachineInfo = TimeMachineInfo { producer :: Producer
                                        , model :: Int
                                        , new :: Bool } deriving (Show, Eq)  
 
-clientName :: Client -> String
-clientName client = case client of
-    GovOrg name -> name
-    Company name _ _ _ -> name
-    Individual (Person fName lName _) _ -> fName ++ " " ++ lName
+getClientName :: Client a -> String
+getClientName client = case client of
+    GovOrg  _ name      -> name
+    Company _ name _ _  -> name
+    Individual _ (Person fName lName _) -> fName ++ " " ++ lName
 
-companyName :: Client -> Maybe String
+companyName :: Client a -> Maybe String
 companyName client = case client of
-    Company name _ _ _  -> Just name
+    Company _ name _ _  -> Just name
     _                   -> Nothing
 
 -- Task 2.5
@@ -71,11 +69,11 @@ countGender stat Male   = GenderStatInfo ((maleCount stat) + 1) (femaleCount sta
 countGender stat Female = GenderStatInfo (maleCount stat) ((femaleCount stat) + 1)
 countGender stat Unknown = stat
 
-genderStat :: [Client] -> GenderStatInfo
+genderStat :: [Client a] -> GenderStatInfo
 genderStat clients = 
     let calc [] stats = stats
         calc (client:xs) stats = 
-            let applyStat (Individual (Person _ _ gender) _) stat = countGender stat gender
+            let applyStat (Individual _ (Person _ _ gender)) stat = countGender stat gender
                 applyStat _ stat                                  = stat
             in calc xs (applyStat client stats)
     in calc clients (GenderStatInfo 0 0)
@@ -105,40 +103,27 @@ unzip' [] = ([], [])
 unzip' (x:xs) = plus ((fst x), (snd x)) (unzip' xs)
 
 
-responsibility :: Client -> String
-responsibility (Company r _ _ _ ) = r
+responsibility :: Client a -> String
+responsibility (Company _ r _ _ ) = r
 responsibility _ = "Unknown"
 
-specialClient :: Client -> Bool
+specialClient :: Client a -> Bool
 specialClient (clientName -> "Mr. Alejandro") = True
 specialClient (responsibility -> "Director") = True
 specialClient _ = False 
 
 
 -- Records
+greet :: Client a -> String
+greet Individual { person = Person { .. } } = "Hi, " ++ firstName
+greet Company { .. } = "Hello, " ++ clientName
+greet GovOrg { } = "Welcome"
 
-data ClientR = GovOrgR  { clientRName :: String } 
-             | CompanyR { clientRName :: String
-                        , companyId :: Integer
-                        , person :: PersonR
-                        , duty :: String }
-             | IndividualR { person :: PersonR }
-             deriving Show
-
-data PersonR = PersonR { firstName :: String
-                       , lastName :: String }
-                       deriving Show
-
-greet :: ClientR -> String
-greet IndividualR { person = PersonR { .. } } = "Hi, " ++ firstName
-greet CompanyR { .. } = "Hello, " ++ clientRName
-greet GovOrgR { } = "Welcome"
-
-nameInCapitals :: PersonR -> PersonR
-nameInCapitals p@(PersonR { firstName = initial:rest }) =
+nameInCapitals :: Person -> Person
+nameInCapitals p@(Person { firstName = initial:rest }) =
     let newName = (toUpper initial):rest
      in p { firstName = newName }
-nameInCapitals p@(PersonR { firstName = ""}) = p
+nameInCapitals p@(Person { firstName = ""}) = p
 
 
 -- Default values

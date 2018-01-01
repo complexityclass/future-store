@@ -8,14 +8,14 @@ spec = do
     describe "Prelude.head" $ do
     
         it "Get client name" $ do
-            clientName (Individual (Person "John" "Black" Male) True) `shouldBe` "John Black"
+            getClientName (Individual 123 (Person "John" "Black" Male)) `shouldBe` "John Black"
 
             
         it "Calculate gender stat" $ do
-            let client1 = (Individual (Person "John" "Black" Male) True)
-                client2 = (Individual (Person "Jack" "White" Male) True)
-                client3 = (Individual (Person "Melissa" "Green" Female) True)
-                client4 = GovOrg "Sony"
+            let client1 = (Individual 123 (Person "John" "Black" Male))
+                client2 = (Individual 124 (Person "Jack" "White" Male))
+                client3 = (Individual 125 (Person "Melissa" "Green" Female))
+                client4 = GovOrg 126 "Sony"
              in genderStat [client1, client2, client3, client4] `shouldBe` (GenderStatInfo 2 1)
 
 
@@ -34,7 +34,8 @@ spec = do
              in unzip' input `shouldBe` ([1,3,5], [2,4,6])
 
         it "Greet clien " $ do
-            let client = IndividualR { person = PersonR { lastName = "Smith", firstName = "John" } }
+            let client = Individual { clientId = 123, person = Person { lastName = "Smith", firstName = "John", gender = Male } }
                 greeting = greet client
              in greeting `shouldBe` "Hi, John"
 
+    
