@@ -96,6 +96,16 @@ minimumClient' clients = foldr (\client acc ->
                                         Nothing   -> Just client
                                         Just curr -> if nameLength curr > nameLength client
                                                       then Just client
-                                                      else Just curr) Nothing clients 
+                                                      else Just curr) Nothing clients
+                                                      
+skipUntilGov :: [Client] -> [Client]
+skipUntilGov = dropWhile (\case { GovOrg {} -> False; _ -> True })
+
+isIndividual :: Client -> Bool
+isIndividual (Individual {}) = True
+isIndividual _               = False
+
+checkIndividualAnalytics :: [Client] -> (Bool, Bool)
+checkIndividualAnalytics cs = (any isIndividual cs, not $ all isIndividual cs)
 
 
