@@ -1,6 +1,7 @@
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TransformListComp #-}
 
 module Chapter2.DataTypes (
     Client (..),
@@ -10,27 +11,30 @@ module Chapter2.DataTypes (
     TimeMachine (..),
     Producer (..),
     TimeMachineInfo (..),
-    clientName,
+    getClientName,
     genderStat,
     performSale,
     unzip',
-    ClientR (..),
-    PersonR (..),
+    compareClient,
+    ConnOptions(),
+    connDefault,
     greet
     ) where
 
 import Data.Char
+import Data.List
+import GHC.Exts
 
-data Client = GovOrg     String
-            | Company    String Integer Person Bool
-            | Individual Person Bool
-            deriving Show
+data Client i = GovOrg   { clientId :: i, clientName :: String }
+              | Company  { clientId :: i, clientName :: String, person :: Person, duty :: String }
+              | Individual { clientId :: i, person :: Person }
+              deriving (Show, Eq)
 
-data Person = Person String String Gender
-            deriving Show
+data Person = Person { firstName :: String, lastName :: String, gender :: Gender }
+              deriving (Show, Eq)
 
 data Gender = Male | Female | Unknown
-            deriving Show
+              deriving (Show, Eq)
 
 data TimeMachine = TimeMachine { info :: TimeMachineInfo
                                , price :: Float } deriving (Show, Eq)
@@ -41,15 +45,15 @@ data TimeMachineInfo = TimeMachineInfo { producer :: Producer
                                        , model :: Int
                                        , new :: Bool } deriving (Show, Eq)  
 
-clientName :: Client -> String
-clientName client = case client of
-    GovOrg name -> name
-    Company name _ _ _ -> name
-    Individual (Person fName lName _) _ -> fName ++ " " ++ lName
+getClientName :: Client a -> String
+getClientName client = case client of
+    GovOrg  _ name      -> name
+    Company _ name _ _  -> name
+    Individual _ (Person fName lName _) -> fName ++ " " ++ lName
 
-companyName :: Client -> Maybe String
+companyName :: Client a -> Maybe String
 companyName client = case client of
-    Company name _ _ _  -> Just name
+    Company _ name _ _  -> Just name
     _                   -> Nothing
 
 -- Task 2.5
@@ -69,11 +73,11 @@ countGender stat Male   = GenderStatInfo ((maleCount stat) + 1) (femaleCount sta
 countGender stat Female = GenderStatInfo (maleCount stat) ((femaleCount stat) + 1)
 countGender stat Unknown = stat
 
-genderStat :: [Client] -> GenderStatInfo
+genderStat :: [Client a] -> GenderStatInfo
 genderStat clients = 
     let calc [] stats = stats
         calc (client:xs) stats = 
-            let applyStat (Individual (Person _ _ gender) _) stat = countGender stat gender
+            let applyStat (Individual _ (Person _ _ gender)) stat = countGender stat gender
                 applyStat _ stat                                  = stat
             in calc xs (applyStat client stats)
     in calc clients (GenderStatInfo 0 0)
@@ -103,41 +107,36 @@ unzip' [] = ([], [])
 unzip' (x:xs) = plus ((fst x), (snd x)) (unzip' xs)
 
 
-responsibility :: Client -> String
-responsibility (Company r _ _ _ ) = r
+responsibility :: Client a -> String
+responsibility (Company _ r _ _ ) = r
 responsibility _ = "Unknown"
 
-specialClient :: Client -> Bool
+specialClient :: Client a -> Bool
 specialClient (clientName -> "Mr. Alejandro") = True
 specialClient (responsibility -> "Director") = True
 specialClient _ = False 
 
 
 -- Records
+greet :: Client a -> String
+greet Individual { person = Person { .. } } = "Hi, " ++ firstName
+greet Company { .. } = "Hello, " ++ clientName
+greet GovOrg { } = "Welcome"
 
-data ClientR = GovOrgR  { clientRName :: String } 
-             | CompanyR { clientRName :: String
-                        , companyId :: Integer
-                        , person :: PersonR
-                        , duty :: String }
-             | IndividualR { person :: PersonR }
-             deriving Show
-
-data PersonR = PersonR { firstName :: String
-                       , lastName :: String }
-                       deriving Show
-
-greet :: ClientR -> String
-greet IndividualR { person = PersonR { .. } } = "Hi, " ++ firstName
-greet CompanyR { .. } = "Hello, " ++ clientRName
-greet GovOrgR { } = "Welcome"
-
-nameInCapitals :: PersonR -> PersonR
-nameInCapitals p@(PersonR { firstName = initial:rest }) =
+nameInCapitals :: Person -> Person
+nameInCapitals p@(Person { firstName = initial:rest }) =
     let newName = (toUpper initial):rest
      in p { firstName = newName }
-nameInCapitals p@(PersonR { firstName = ""}) = p
+nameInCapitals p@(Person { firstName = ""}) = p
 
+---
+compareClient :: Client a -> Client a -> Ordering
+compareClient (Individual { person = p1 }) (Individual { person = p2 }) 
+    = compare (firstName p1) (firstName p2)
+
+compareClient (Individual {}) _ = GT
+compareClient _ (Individual {}) = LT
+compareClient c1 c2 = compare (clientName c1) (clientName c2)
 
 -- Default values
 
@@ -157,3 +156,21 @@ connDefault = ConnOptions TCP 0 NoProxy False False NoTimeOut
 
 connect' :: String -> ConnOptions -> Connection
 connect' _ = undefined
+
+---
+
+companyDutiesAnalytics :: [Client a] -> [String]
+companyDutiesAnalytics = map (duty . head) .
+                           sortBy (\x y -> compare (length y) (length x)) .
+                           groupBy (\x y -> duty x == duty y) .
+                           filter isCompany
+                        where isCompany (Company {}) = True
+                              isCompany _            = False
+
+
+companyAnalytics :: [Client a] -> [(String, [(Person, String)])]
+companyAnalytics clients = [ (the clientName, zip person duty) 
+                           | client@(Company {..}) <- clients
+                           , then sortWith by duty
+                           , then group by clientName using groupWith
+                           , then sortWith by length client]
