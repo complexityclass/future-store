@@ -36,6 +36,16 @@ spec = do
         it "Sort clients" $ do
             (sortBy compareClient listOfClients) !! 0 `shouldBe` (GovOrg {clientId = 3, clientName = "NTTF"}) 
 
+---
+
+enum :: Int -> Int -> [Int]
+enum a b | a > b = []
+enum a b = a : enum (a + 1) b
+
+withPositions :: [a] -> [(Int, a)]
+withPositions list = zip (enum 1 $ length list) list
+
+
         
 
 

@@ -1,6 +1,7 @@
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TransformListComp #-}
 
 module Chapter2.DataTypes (
     Client (..),
@@ -21,6 +22,8 @@ module Chapter2.DataTypes (
     ) where
 
 import Data.Char
+import Data.List
+import GHC.Exts
 
 data Client i = GovOrg   { clientId :: i, clientName :: String }
               | Company  { clientId :: i, clientName :: String, person :: Person, duty :: String }
@@ -153,3 +156,21 @@ connDefault = ConnOptions TCP 0 NoProxy False False NoTimeOut
 
 connect' :: String -> ConnOptions -> Connection
 connect' _ = undefined
+
+---
+
+companyDutiesAnalytics :: [Client a] -> [String]
+companyDutiesAnalytics = map (duty . head) .
+                           sortBy (\x y -> compare (length y) (length x)) .
+                           groupBy (\x y -> duty x == duty y) .
+                           filter isCompany
+                        where isCompany (Company {}) = True
+                              isCompany _            = False
+
+
+companyAnalytics :: [Client a] -> [(String, [(Person, String)])]
+companyAnalytics clients = [ (the clientName, zip person duty) 
+                           | client@(Company {..}) <- clients
+                           , then sortWith by duty
+                           , then group by clientName using groupWith
+                           , then sortWith by length client]
