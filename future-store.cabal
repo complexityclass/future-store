@@ -29,11 +29,13 @@ library
       src
   build-depends:
       base >= 4.7 && < 5
+    , containers
   exposed-modules:
       Chapter2.DataTypes
       Chapter2.SimpleFunctions
       Chapter3.Lists
       Chapter3.Stubs
+      Chapter4.Containers
       Lib
   default-language: Haskell2010
 
@@ -45,6 +47,7 @@ executable future-store-exe
   build-depends:
       base >= 4.7 && < 5
     , future-store
+    , persistent
   default-language: Haskell2010
 
 test-suite future-store-test
@@ -69,8 +72,10 @@ test-suite unit-tests
     , future-store
     , hspec
     , hspec-discover
+    , containers
   other-modules:
       Chapter2.DataTypesSpec
       Chapter2.SimpleFunctionsSpec
       Chapter3.ListsSpec
+      Chapter4.ContainersSpec
   default-language: Haskell2010

@@ -24,6 +24,8 @@ dependencies:
 
 library:
   source-dirs: src
+  dependencies:
+  - containers
 
 executables:
   future-store-exe:
@@ -35,6 +37,7 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - future-store
+    - persistent
 
 tests:
   future-store-test:
@@ -58,6 +61,7 @@ tests:
     - future-store
     - hspec
     - hspec-discover
+    - containers
 
 
 
