@@ -11,6 +11,7 @@ module Chapter2.DataTypes (
     TimeMachine (..),
     Producer (..),
     TimeMachineInfo (..),
+    ClientKind (..),
     getClientName,
     genderStat,
     performSale,
@@ -18,23 +19,28 @@ module Chapter2.DataTypes (
     compareClient,
     ConnOptions(),
     connDefault,
-    greet
+    greet,
+    classifyClientsA,
+    classifyClientsB
     ) where
 
 import Data.Char
 import Data.List
 import GHC.Exts
+import qualified Data.Map as M
+import qualified Data.Set as S
+
 
 data Client i = GovOrg   { clientId :: i, clientName :: String }
               | Company  { clientId :: i, clientName :: String, person :: Person, duty :: String }
               | Individual { clientId :: i, person :: Person }
-              deriving (Show, Eq)
+              deriving (Show, Eq, Ord)
 
 data Person = Person { firstName :: String, lastName :: String, gender :: Gender }
-              deriving (Show, Eq)
+              deriving (Show, Eq, Ord)
 
 data Gender = Male | Female | Unknown
-              deriving (Show, Eq)
+              deriving (Show, Eq, Ord)
 
 data TimeMachine = TimeMachine { info :: TimeMachineInfo
                                , price :: Float } deriving (Show, Eq)
@@ -174,3 +180,29 @@ companyAnalytics clients = [ (the clientName, zip person duty)
                            , then sortWith by duty
                            , then group by clientName using groupWith
                            , then sortWith by length client]
+
+
+-- Chapter 4
+
+data ClientKind  = GovOrgKind | CompanyKind | IndividualKind deriving (Show, Eq, Ord)
+
+
+classifyClientsA :: [Client Integer] -> M.Map ClientKind (S.Set (Client Integer))
+classifyClientsA [] =  M.fromList [(GovOrgKind, S.empty), (CompanyKind, S.empty), (IndividualKind, S.empty)]
+classifyClientsA (x:xs) = case x of
+    GovOrg _ _      -> M.unionWith (S.union) (M.singleton GovOrgKind (S.singleton x)) (classifyClientsA xs)
+    Company _ _ _ _ -> M.unionWith (S.union) (M.singleton CompanyKind (S.singleton x)) (classifyClientsA xs)  
+    Individual _ _  -> M.unionWith (S.union) (M.singleton IndividualKind (S.singleton x)) (classifyClientsA xs)
+
+
+classifyClientsB :: [Client Integer] -> M.Map ClientKind (S.Set (Client Integer))
+classifyClientsB list = 
+    let govOrgKind = filter (\x -> case x of GovOrg _ _ -> True
+                                             _          -> False) list
+        companyKind = filter (\x -> case x of Company _ _ _ _ -> True
+                                              _           -> False) list
+        individualKind = filter (\x -> case x of Individual _ _ -> True
+                                                 _           -> False) list
+     in M.fromList [(GovOrgKind, (S.fromList govOrgKind)), 
+                    (CompanyKind, (S.fromList companyKind)), 
+                    (IndividualKind, (S.fromList individualKind))]
