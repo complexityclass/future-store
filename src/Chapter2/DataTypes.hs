@@ -21,7 +21,8 @@ module Chapter2.DataTypes (
     connDefault,
     greet,
     classifyClientsA,
-    classifyClientsB
+    classifyClientsB,
+    timeMachinePrecedence
     ) where
 
 import Data.Char
@@ -29,6 +30,7 @@ import Data.List
 import GHC.Exts
 import qualified Data.Map as M
 import qualified Data.Set as S
+import Data.Graph
 
 
 data Client i = GovOrg   { clientId :: i, clientName :: String }
@@ -206,3 +208,13 @@ classifyClientsB list =
      in M.fromList [(GovOrgKind, (S.fromList govOrgKind)), 
                     (CompanyKind, (S.fromList companyKind)), 
                     (IndividualKind, (S.fromList individualKind))]
+
+
+timeMachineGraph :: [(String, String, [String])]
+timeMachineGraph = 
+    [("wood","wood",["walls"]), ("plastic","plastic",["walls","wheels"])
+    ,("aluminum","aluminum",["wheels","door"]),("walls","walls",["done"])
+    ,("wheels","wheels",["done"]),("door","door",["done"]),("done","done",[])]
+
+timeMachinePrecedence :: (Graph, Vertex -> (String, String, [String]), String -> Maybe Vertex)
+timeMachinePrecedence = graphFromEdges timeMachineGraph

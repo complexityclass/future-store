@@ -7,6 +7,8 @@ import Chapter2.DataTypes
 import Chapter3.Stubs
 import qualified Data.Map as M
 import qualified Data.Set as S
+import Data.Tree
+import Data.Graph
 
 spec :: Spec
 spec = do
@@ -51,3 +53,27 @@ spec = do
         
         it "Classify clients method B" $ do
             (classifyClientsB listOfClients) `shouldBe` (classifyClientsA listOfClients)
+
+        it "Traverse pre order" $ do
+            let tree = Node 1 [ Node 2 [ Node 3 [],
+                                         Node 4 [],
+                                         Node 5 [] ]
+                              , Node 6 [] ]
+             in preOrder show tree `shouldBe` ["1", "2", "3", "4", "5", "6"]
+             
+        it "Check precedence" $ do
+            let (g,v,_) = timeMachinePrecedence
+             in (map (\x -> let (k,_,_) = v x in k) $ topSort g) 
+             `shouldBe` ["wood","plastic","walls","aluminum","door","wheels","done"]
+
+        it "Check travel" $ do
+            (path timeMachineTravel 1302 917) `shouldBe` True
+
+
+
+-- Helpers
+
+timeMachineTravel :: Graph
+timeMachineTravel = buildG (103,2013)
+                [(1302,1614),(1614,1302),(1302,2013),(2013,1302),(1614,2013)
+                ,(2013,1408),(1408,1993),(1408,917),(1993,917),(907,103),(103,917)]

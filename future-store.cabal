@@ -31,11 +31,13 @@ library
       base >= 4.7 && < 5
     , containers
   exposed-modules:
+      App.Client
       Chapter2.DataTypes
       Chapter2.SimpleFunctions
       Chapter3.Lists
       Chapter3.Stubs
       Chapter4.Containers
+      Chapter4.TypeClasses
       Lib
   default-language: Haskell2010
 
@@ -78,4 +80,5 @@ test-suite unit-tests
       Chapter2.SimpleFunctionsSpec
       Chapter3.ListsSpec
       Chapter4.ContainersSpec
+      Chapter4.TypeClassesSpecs
   default-language: Haskell2010
