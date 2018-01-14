@@ -2,6 +2,7 @@ module Chapter2.DataTypesSpec where
     
 import Test.Hspec
 import Chapter2.DataTypes
+import App.Client
     
 spec :: Spec
 spec = do

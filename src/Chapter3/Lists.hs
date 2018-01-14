@@ -9,6 +9,7 @@ module Chapter3.Lists (
     minimumClient'
 ) where
 
+import App.Client
 import Chapter2.DataTypes
 import Data.List hiding (head, tail)
 

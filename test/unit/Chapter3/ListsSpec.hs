@@ -1,6 +1,7 @@
 module Chapter3.ListsSpec where
     
 import Test.Hspec
+import App.Client
 import Chapter3.Lists
 import Chapter2.DataTypes
 import Chapter3.Stubs
