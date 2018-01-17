@@ -24,6 +24,7 @@ import GHC.Exts
 import qualified Data.Map as M
 import qualified Data.Set as S
 import Data.Graph
+import App.CommonInterfaces
 
 data Client i = GovOrg   { clientId :: i, clientName :: String }
               | Company  { clientId :: i, clientName :: String, person :: Person, duty :: String }
@@ -91,4 +92,15 @@ companyAnalytics clients = [ (the clientName, zip person duty)
                            , then sortWith by duty
                            , then group by clientName using groupWith
                            , then sortWith by length client]
+
+
+instance Nameable (Client i) where
+    name Individual { person = Person { firstName = f, lastName = n } } = f ++ " " ++ n
+    name c = clientName c
+
+instance Priceable TimeMachine where
+    price TimeMachine { info = _, price = p } = p
+
+
+
 
