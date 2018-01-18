@@ -29,15 +29,15 @@ import App.CommonInterfaces
 data Client i = GovOrg   { clientId :: i, clientName :: String }
               | Company  { clientId :: i, clientName :: String, person :: Person, duty :: String }
               | Individual { clientId :: i, person :: Person }
-              deriving (Show, Eq, Ord)
+              deriving (Show, Ord)
 
 
 data Person = Person { firstName :: String, lastName :: String, gender :: Gender }
-              deriving (Show, Eq, Ord)
+              deriving (Show, Eq, Ord, Read)
 
 
 data Gender = Male | Female | Unknown
-              deriving (Show, Eq, Ord)
+              deriving (Show, Eq, Ord, Read)
 
 
 data TimeMachine = TimeMachine { info :: TimeMachineInfo
@@ -100,6 +100,18 @@ instance Nameable (Client i) where
 
 instance Priceable TimeMachine where
     price TimeMachine { info = _, price = p } = p
+
+instance Eq i => Eq (Client i) where
+    GovOrg   { clientId = lId, clientName = lName } == 
+        GovOrg   { clientId = rId, clientName = rName } = (lId == rId) && (lName == rName)
+    Individual { person = lp } == Individual { person = rp } = lp == rp
+    Company  { clientId = lc, clientName = ln, person = lp, duty = ld} == 
+        Company  { clientId = rc, clientName = rn, person = rp, duty = rd} 
+        = (lc == rc) && (ln == rn) && (lp == rp) && (ld == rd)
+    _ == _ = False
+
+
+
 
 
 
