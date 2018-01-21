@@ -29,7 +29,7 @@ import App.CommonInterfaces
 data Client i = GovOrg   { clientId :: i, clientName :: String }
               | Company  { clientId :: i, clientName :: String, person :: Person, duty :: String }
               | Individual { clientId :: i, person :: Person }
-              deriving (Show, Ord)
+              deriving (Show)
 
 
 data Person = Person { firstName :: String, lastName :: String, gender :: Gender }
@@ -44,7 +44,7 @@ data TimeMachine = TimeMachine { info :: TimeMachineInfo
                                , price :: Float } deriving (Show, Eq)
 
 
-data Producer = Producer { name :: String } deriving (Show, Eq)
+data Producer = Producer { producerName :: String } deriving (Show, Eq)
 
 
 data TimeMachineInfo = TimeMachineInfo { producer :: Producer
@@ -110,7 +110,25 @@ instance Eq i => Eq (Client i) where
         = (lc == rc) && (ln == rn) && (lp == rp) && (ld == rd)
     _ == _ = False
 
-
+instance Eq i => Ord (Client i) where
+    compare l r = 
+        case (compare (name l) (name r)) of
+            GT -> GT
+            LT -> LT
+            EQ -> compare_ l r
+    
+compare_ :: (Client i) -> (Client i) -> Ordering
+compare_ (Individual {}) (GovOrg {}) = GT
+compare_ (Individual {}) (Company {}) = GT
+compare_ (GovOrg {}) (Individual {}) = LT
+compare_ (Company {}) (Individual {}) = LT
+compare_ (Company {}) (GovOrg {}) = GT
+compare_ (GovOrg {}) (Company {}) = LT
+compare_ (GovOrg {}) (GovOrg {}) = EQ
+compare_ (Company {person = lp}) (Company {person = rp}) = compare lp rp
+compare_ (Individual {}) (Individual {}) = EQ
+compare_ _ _ = EQ
+                    
 
 
 
