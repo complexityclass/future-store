@@ -33,6 +33,8 @@ library
   exposed-modules:
       App.Client
       App.CommonInterfaces
+      App.TravelGuide
+      App.Utils.BinaryTree
       Chapter2.DataTypes
       Chapter2.SimpleFunctions
       Chapter3.Lists
@@ -80,6 +82,7 @@ test-suite unit-tests
       Chapter2.DataTypesSpec
       Chapter2.SimpleFunctionsSpec
       Chapter3.ListsSpec
+      Chapter4.BinaryTreeSpec
       Chapter4.ContainersSpec
       Chapter4.TypeClassesSpec
   default-language: Haskell2010
