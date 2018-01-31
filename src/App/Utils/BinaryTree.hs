@@ -1,7 +1,9 @@
 module App.Utils.BinaryTree (
     BinaryTree (..),
     treeInsert,
-    treeFind
+    treeFind,
+    treeTraverse,
+    treeUnion
 ) where
 
 
@@ -24,3 +26,14 @@ treeInsert t n@(Node v l r) = case compare t v of
     LT -> Node v (treeInsert t l) r
     GT -> Node v l (treeInsert t r)
 treeInsert t Leaf = Node t Leaf Leaf
+
+treeTraverse :: Ord a => BinaryTree a -> [a]
+treeTraverse Leaf = []
+treeTraverse (Node v l r) = (treeTraverse l) ++ [v] ++ (treeTraverse r)
+
+treeUnion :: Ord a => BinaryTree a -> BinaryTree a -> BinaryTree a
+treeUnion lTree rTree = append (treeTraverse lTree) rTree 
+    where 
+        append [] tree = tree
+        append (x:xs) tree = append xs (treeInsert x tree)
+
