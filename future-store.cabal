@@ -35,6 +35,7 @@ library
       App.CommonInterfaces
       App.TravelGuide
       App.Utils.BinaryTree
+      App.Utils.CachedBinaryTree
       Chapter2.DataTypes
       Chapter2.SimpleFunctions
       Chapter3.Lists
